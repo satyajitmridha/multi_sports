@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:multi_sports/api/apis.dart';
 
 class Sponsors extends StatefulWidget {
   @override
@@ -20,7 +21,7 @@ class _Sponsors extends State<Sponsors> {
 
   Future<void> fetchSponsors() async {
     try {
-      final response = await http.get(Uri.parse('https://sports.forcempower.com/darts/show_sponsors_details.php')); // Replace with actual API URL
+      final response = await http.get(Uri.parse(Apis.fetchSponsors)); // Replace with actual API URL
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -46,7 +47,7 @@ class _Sponsors extends State<Sponsors> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Event', style: TextStyle(color: Colors.white)),
+        title: Text('Sponsors', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),

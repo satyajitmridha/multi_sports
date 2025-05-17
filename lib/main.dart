@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:multi_sports/match_result_page.dart';
 import 'package:multi_sports/screens/lederboard/leader_board.dart';
+import 'package:multi_sports/screens/owner_team/owner_list.dart';
 import 'package:multi_sports/screens/profile.dart';
 import 'screens/event_detail_screen.dart';
 import 'screens/about.dart';
@@ -9,6 +11,10 @@ import 'screens/captain_room/loging_captain.dart';
 import 'screens/hand_book.dart';
 import 'screens/commitee.dart';
 import 'screens/sponsors.dart';
+import 'screens/owner_team/owner_list.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'match_schedule_page.dart';
+
 
 
 
@@ -58,7 +64,7 @@ class DashboardScreen extends StatelessWidget {
     {'title': 'Handbook', 'icon': Icons.rule, 'color': Colors.orange},
     {'title': 'Committee', 'icon': Icons.person, 'color': Colors.green},
     {'title': 'Sponsors', 'icon': Icons.monetization_on, 'color': Colors.green},
-    {'title': 'Teams', 'icon': Icons.group, 'color': Colors.purple},
+    {'title': 'Owners and Teams', 'icon': Icons.group, 'color': Colors.purple},
     {'title': 'Gallery', 'icon': Icons.photo_library, 'color': Colors.pink},
     {'title': 'Play Along', 'icon': Icons.sports_esports, 'color': Colors.teal},
     {'title': 'Scan me', 'icon': Icons.qr_code_scanner, 'color': Colors.indigo},
@@ -176,6 +182,18 @@ class DashboardScreen extends StatelessWidget {
           MaterialPageRoute(builder: (context) => LogingCaptain()),
         );
         break;
+      case 'Feedback':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => EventDetailScreen1()),
+        );
+        break;
+      case 'Owners and Teams':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => OwnerList()),
+        );
+        break;
       default:
         print("$title tapped");
     }
@@ -244,7 +262,7 @@ class DashboardScreen extends StatelessWidget {
             actions: [
               IconButton(
                 icon: Badge(
-                  label: Text("3"),
+                  label: Text("0"),
                   child: Icon(Icons.notifications, color: Colors.white),
                 ),
                 onPressed: () => print("Notifications Clicked"),
@@ -387,13 +405,17 @@ class DashboardScreen extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 8),
-                          Text(
-                            menuItems[index]['title'],
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
+                         AutoSizeText(
+                          menuItems[index]['title'],
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
                           ),
+                          maxLines: 1, // Ensures it stays on one line
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          minFontSize: 8, // Adjust font size dynamically
+                        ),
                         ],
                       ),
                     ),
@@ -403,6 +425,7 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
           ),
+       
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.fromLTRB(16, 24, 16, 16),
@@ -543,14 +566,24 @@ class DashboardScreen extends StatelessWidget {
           activeIcon: Icons.schedule,
           label: "Schedule",
           isActive: false,
-          onTap: () {},
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => MatchSchedulePage()),
+            );
+          },
         ),
         _buildBottomNavItem(
           icon: Icons.star_border,
           activeIcon: Icons.star,
           label: "Results",
           isActive: false,
-          onTap: () {},
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => MatchResultPage()),
+            );
+          },
         ),
         _buildBottomNavItem(
           icon: Icons.meeting_room_outlined,
