@@ -1,14 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import '../api/apis.dart';
 
-class About extends StatefulWidget {
+class Gallery extends StatefulWidget {
   @override
-  _AboutState createState() => _AboutState();
+  _Gallery createState() => _Gallery();
 }
 
-class _AboutState extends State<About> {
+class _Gallery extends State<Gallery> {
   late final WebViewController _controller;
   bool _isLoading = true;
 
@@ -49,14 +48,14 @@ class _AboutState extends State<About> {
       )
       ..setUserAgent(
           "Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Mobile Safari/537.36")
-      ..loadRequest(Uri.parse(Apis.about));
+      ..loadRequest(Uri.parse('https://www.kamero.ai/darts24'));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('About', style: TextStyle(color: Colors.white)),
+        title: const Text('Gallery', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),

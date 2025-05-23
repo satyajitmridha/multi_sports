@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'dart_score.dart';
 import 'dart_match_setup.dart';
+import '../comming_soon.dart';
 
 
 class DartsHome extends StatefulWidget {
@@ -24,7 +25,7 @@ class _DartsHome extends State<DartsHome> {
       case 'Score':
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => DartScore()),
+          MaterialPageRoute(builder: (context) => CommingSoon()),
         );
         break;
       case 'Match Setup':
@@ -43,7 +44,7 @@ class _DartsHome extends State<DartsHome> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(title: Text('About', style: TextStyle(color: Colors.white)),
+      appBar: AppBar(title: Text('Darts', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),

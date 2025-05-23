@@ -11,8 +11,11 @@ class Apis{
     static const String fetchOwnerDetails = "$baseUrl/fetch_owner_details";
     static const String fetchOwnerAndTeams = "$baseUrl/show_team_and_participants_details.php";
     static const String fetchOwnerAndTeamsDetails = "$baseUrl/show_team_and_participants_details.php";
-    static const String fetchMatchSchedule = "$baseUrlRPGL/show_schedule_and_results_details_new.php?showall=YES";
-    static const String fetchMatchScheduleAndResults = "$baseUrlRPGL/show_results_details_new.php";
+    static const String fetchMatchSchedule = "$baseUrl/show_schedule_and_results_details_new.php?showall=YES";
+    static const String fetchMatchScheduleAndResults = "$baseUrl/show_results_details_new.php";
+    static const String fetchBannerFCMDetails = "$baseUrl/sql_tracking_log.php";
+    static const String about = "$baseUrl/about_details/about.php?username=";
+    static const String showAppVersion = "$baseUrl/show_app_version.php";
 
   
 }

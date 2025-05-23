@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:multi_sports/match_result_page.dart';
-import 'package:multi_sports/screens/lederboard/leader_board.dart';
-import 'package:multi_sports/screens/owner_team/owner_list.dart';
-import 'package:multi_sports/screens/profile.dart';
+import 'match_result_page.dart';
+import 'screens/lederboard/leader_board.dart';
+import 'screens/owner_team/owner_list.dart';
+import 'screens/profile.dart';
 import 'screens/event_detail_screen.dart';
 import 'screens/about.dart';
 import 'screens/event.dart';
@@ -14,11 +14,38 @@ import 'screens/sponsors.dart';
 import 'screens/owner_team/owner_list.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'match_schedule_page.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'notification_service.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'api/apis.dart';
+import 'notification_service.dart';
+import 'screens/gallery.dart';
+import 'screens/social_media.dart';
+import 'screens/comming_soon.dart';
 
 
-
-
-void main() {
+void main() async {
+    WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  await NotificationService.initialize();
+    // Get and send FCM token
+  String? token = await NotificationService.getFCMToken();
+  
+  // if (token != null) {
+  //   print("FCM Token: $token");
+  // } else {
+  //   print("Failed to get FCM token");
+  // }
+  // if (token != null) {
+  //   print("FCM Token: $token");
+  // } else {
+  //   print("Failed to get FCM token");
+  // }
+  await NotificationService.sendTokenToServer(token);
+  
   runApp(SportsCarnivalApp());
 }
 
@@ -58,21 +85,31 @@ class SportsCarnivalApp extends StatelessWidget {
   }
 }
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
+  @override
+  _DashboardScreenState createState() => _DashboardScreenState();
+}
+class _DashboardScreenState extends State<DashboardScreen> {
+
+  String? bannerImageUrl;
+  String appVersion="1.0.0";
+
+
   final List<Map<String, dynamic>> menuItems = [
     {'title': 'About', 'icon': Icons.info_outline, 'color': Colors.blueAccent},
     {'title': 'Handbook', 'icon': Icons.rule, 'color': Colors.orange},
     {'title': 'Committee', 'icon': Icons.person, 'color': Colors.green},
     {'title': 'Sponsors', 'icon': Icons.monetization_on, 'color': Colors.green},
-    {'title': 'Owners and Teams', 'icon': Icons.group, 'color': Colors.purple},
+    {'title': 'Owners & Teams', 'icon': Icons.group, 'color': Colors.purple},
     {'title': 'Gallery', 'icon': Icons.photo_library, 'color': Colors.pink},
-    {'title': 'Play Along', 'icon': Icons.sports_esports, 'color': Colors.teal},
-    {'title': 'Scan me', 'icon': Icons.qr_code_scanner, 'color': Colors.indigo},
     {'title': 'Events', 'icon': Icons.event, 'color': Colors.redAccent},
-    {'title': 'Highlights', 'icon': Icons.highlight, 'color': Colors.amber},
-    {'title': 'Captain & team', 'icon': Icons.group_add, 'color': Colors.cyan},
-    {'title': 'Score', 'icon': Icons.score, 'color': Colors.lightBlue},
-    {'title': 'Feedback', 'icon': Icons.feedback, 'color': Colors.deepOrange},
+    
+   
+    //{'title': 'Score', 'icon': Icons.score, 'color': Colors.lightBlue},
+    
+    {'title': 'Social Media', 'icon': Icons.share, 'color': Colors.purpleAccent},
+   
+    
   ];
 
   final List<Map<String, dynamic>> carouselItems = [
@@ -107,6 +144,85 @@ class DashboardScreen extends StatelessWidget {
       'description': '3-on-3 street basketball'
     },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchBannerData();
+    fetchAppVersionData();
+
+  }
+  Future<void> fetchBannerData() async {
+    try {
+      String? token = await NotificationService.getFCMToken();
+     // final response = await http.get(Uri.parse(Apis.fetchBannerFCMDetails));
+      if (token == null) {
+        print("Failed to get FCM token");
+        return;
+      }
+      // Get device info
+
+    final deviceInfo = await NotificationService.getDeviceInfo();
+
+    // Create a map with the required parameters
+    Map<String, dynamic> requestBody = {
+      "deviceid": deviceInfo['device_id'],
+      "registrationid": token,
+      "devicetype": deviceInfo['device_type']
+    };
+
+    // Send a POST request with the parameters
+    // final response = await http.post(
+    //   Uri.parse(Apis.fetchBannerFCMDetails),
+    //   headers: {"Content-Type": "application/json"},
+    //   body: json.encode(requestBody),
+    // );
+
+
+    final response = await http.post(
+      Uri.parse(Apis.fetchBannerFCMDetails),
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
+      body: requestBody,
+    );
+      if (response.statusCode == 200) {
+        Map<String, dynamic> jsonData = json.decode(response.body);
+        setState(() {
+          bannerImageUrl = jsonData['banner_image'];
+        });
+      } else {
+        throw Exception('Failed to load carousel data');
+      }
+    } catch (e) {
+      print('Error fetching carousel data: $e');
+    }
+  }
+
+  Future<void> fetchAppVersionData() async {
+    try {
+ 
+    final deviceInfo = await NotificationService.getDeviceInfo();
+
+    // Create a map with the required parameters
+    Map<String, dynamic> requestBody = {
+      "device_type": deviceInfo['device_type']
+    };
+    final response = await http.post(
+      Uri.parse(Apis.showAppVersion),
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
+      body: requestBody,
+    );
+      if (response.statusCode == 200) {
+        Map<String, dynamic> jsonData = json.decode(response.body);
+        setState(() {
+          appVersion = jsonData['current_app_version'];
+        });
+      } else {
+        throw Exception('Failed to load carousel data');
+      }
+    } catch (e) {
+      print('Error fetching carousel data: $e');
+    }
+  }
 
   void onMenuItemTap(BuildContext context, String title) {
     switch (title) {
@@ -149,31 +265,31 @@ class DashboardScreen extends StatelessWidget {
       case 'Gallery':
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => EventDetailScreen1()),
+          MaterialPageRoute(builder: (context) => Gallery()),
         );
         break;
       case 'Captain & team':
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => EventDetailScreen1()),
+          MaterialPageRoute(builder: (context) => CommingSoon()),
         );
         break;
       case 'Play Along':
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => EventDetailScreen1()),
+          MaterialPageRoute(builder: (context) => CommingSoon()),
         );
         break;
       case 'Scan me':
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => EventDetailScreen1()),
+          MaterialPageRoute(builder: (context) => CommingSoon()),
         );
         break;
       case 'Highlights':
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => EventDetailScreen1()),
+          MaterialPageRoute(builder: (context) => CommingSoon()),
         );
         break;
       case 'Captain room':
@@ -185,13 +301,24 @@ class DashboardScreen extends StatelessWidget {
       case 'Feedback':
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => EventDetailScreen1()),
+          MaterialPageRoute(builder: (context) => CommingSoon()),
         );
         break;
-      case 'Owners and Teams':
+      case 'Owners & Teams':
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => OwnerList()),
+        );
+        break;
+      case 'Social Media':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SocialMediaGrid()),
+        );
+      case 'version':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => CommingSoon()),
         );
         break;
       default:
@@ -201,21 +328,108 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
+    return SafeArea(
+    child:
+    Scaffold(
+      extendBodyBehindAppBar: false,
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(
-            expandedHeight: 220,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: NetworkImage('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'),
-                    fit: BoxFit.cover,
+          // SliverAppBar(
+          //   expandedHeight: 260,
+          //   flexibleSpace: FlexibleSpaceBar(
+          //     background: Container(
+          //       child: Container(
+          //         height: 160,
+          //         width: double.infinity,
+          //          decoration: BoxDecoration(
+          //         image: DecorationImage(
+          //           image: NetworkImage(bannerImageUrl ?? 'https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'),
+          //           fit: BoxFit.cover,
+          //         ),
+          //       ),
+          //       ),
+               
+          //       child: Container(
+          //         decoration: BoxDecoration(
+          //           gradient: LinearGradient(
+          //             begin: Alignment.bottomCenter,
+          //             end: Alignment.topCenter,
+          //             colors: [
+          //               Colors.black.withOpacity(0.7),
+          //               Colors.transparent,
+          //             ],
+          //           ),
+          //         ),
+          //         child: Stack(
+          //           children: [
+          //             Positioned(
+          //               bottom: 10,
+          //               left: 20,
+          //               child: Column(
+          //                 crossAxisAlignment: CrossAxisAlignment.start,
+          //                 children: [
+          //                   Text(
+          //                     "Royal Datrs Premier League 2025",
+          //                     style: TextStyle(
+          //                       color: Colors.white,
+          //                       fontSize: 24,
+          //                       fontWeight: FontWeight.bold,
+          //                       fontFamily: 'Poppins',
+          //                     ),
+          //                   ),
+          //                   SizedBox(height: 8),
+          //                   Text(
+          //                     "Celebrating sportsmanship",
+          //                     style: TextStyle(
+          //                       color: Colors.white.withOpacity(0.9),
+          //                       fontSize: 16,
+          //                     ),
+          //                   ),
+          //                 ],
+          //               ),
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          //   actions: [
+          //     IconButton(
+          //       icon: Badge(
+          //         label: Text("0"),
+          //         child: Icon(Icons.notifications, color: const Color.fromARGB(255, 246, 148, 148)),
+          //       ),
+          //       onPressed: () => print("Notifications Clicked"),
+          //     ),
+          //     IconButton(
+          //       icon: Icon(Icons.person, color: const Color.fromARGB(255, 243, 152, 152)),
+          //       onPressed: () {
+          //         Navigator.push(
+          //           context,
+          //           MaterialPageRoute(builder: (context) => Profile()),
+          //         );
+          //       },
+          //     ),
+          //   ],
+          // ),
+        
+        SliverAppBar(
+          expandedHeight: 260,
+          flexibleSpace: FlexibleSpaceBar(
+            background: Stack(
+              children: [
+                Container(
+                  height: 200,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: NetworkImage(bannerImageUrl ?? 'https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
-                child: Container(
+                Container(
+                  height: 280,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.bottomCenter,
@@ -226,65 +440,134 @@ class DashboardScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  child: Stack(
+                ),
+                Positioned(
+                  bottom: 5,
+                  left: 20,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Positioned(
-                        bottom: 20,
-                        left: 20,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "CSC Sports Carnival",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Poppins',
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              "Celebrating sportsmanship",
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
+                      Text(
+                        "Royal Datrs Premier League 2025",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+                      SizedBox(height: 2),
+                      Text(
+                        "Celebrating sportsmanship",
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9),
+                          fontSize: 14,
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
+              ],
             ),
-            actions: [
-              IconButton(
-                icon: Badge(
-                  label: Text("0"),
-                  child: Icon(Icons.notifications, color: Colors.white),
-                ),
-                onPressed: () => print("Notifications Clicked"),
-              ),
-              IconButton(
-                icon: Icon(Icons.person, color: Colors.white),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Profile()),
-                  );
-                },
-              ),
-            ],
           ),
-          SliverToBoxAdapter(
+          actions: [
+            IconButton(
+              icon: Badge(
+                label: Text("0"),
+                child: Icon(Icons.notifications, color: Color.fromARGB(255, 246, 148, 148)),
+              ),
+              onPressed: () => print("Notifications Clicked"),
+            ),
+            IconButton(
+              icon: Icon(Icons.person, color: Color.fromARGB(255, 243, 152, 152)),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Profile()),
+                );
+              },
+            ),
+          ],
+        ),
+
+        
+          // SliverToBoxAdapter(
+          //   child: Padding(
+          //     padding: EdgeInsets.all(6),
+          //     child: Column(
+          //       crossAxisAlignment: CrossAxisAlignment.start,
+          //       children: [
+          //         // Featured Event Banner
+          //         Container(
+          //           width: double.infinity,
+          //           padding: EdgeInsets.all(6),
+          //           decoration: BoxDecoration(
+          //             borderRadius: BorderRadius.circular(12),
+          //             gradient: LinearGradient(
+          //               colors: [Colors.deepPurple, Colors.purpleAccent],
+          //               begin: Alignment.topLeft,
+          //               end: Alignment.bottomRight,
+          //             ),
+          //             boxShadow: [
+          //               BoxShadow(
+          //                 color: Colors.deepPurple.withOpacity(0.3),
+          //                 blurRadius: 10,
+          //                 offset: Offset(0, 5),
+          //               ),
+          //             ],
+          //           ),
+          //           child: Column(
+          //             crossAxisAlignment: CrossAxisAlignment.start,
+          //             children: [
+                       
+          //               SizedBox(height: 0),
+          //               Center(
+          //                 child: Text(
+          //                   "Royal Darts Premier League 2025",
+          //                   style: TextStyle(
+          //                     color: Colors.white,
+          //                     fontSize: 18,
+          //                     fontWeight: FontWeight.bold,
+          //                   ),
+          //                 ),
+          //               )
+          //               // SizedBox(height: 8),
+          //               //  Text(
+          //               //   "Featured Event",
+          //               //   style: TextStyle(
+          //               //     color: Colors.white.withOpacity(0.8),
+          //               //     fontSize: 14,
+          //               //   ),
+          //               // ),
+          //             ],
+          //           ),
+                  
+                  
+          //         ),
+                  
+          //         SizedBox(height: 24),
+          //         Text(
+          //           "Quick Access",
+          //           style: TextStyle(
+          //             fontSize: 18,
+          //             fontWeight: FontWeight.bold,
+          //           ),
+          //         ),
+          //         SizedBox(height: 12),
+          //       ],
+          //     ),
+          //   ),
+          // ),
+
+           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                 
                   // Featured Event Banner
+                  SizedBox(height: 24),
                   Container(
                     width: double.infinity,
                     padding: EdgeInsets.all(16),
@@ -315,7 +598,7 @@ class DashboardScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 4),
                         Text(
-                          "Ladies Cricket Championship",
+                          "RDPL Championship",
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
@@ -342,7 +625,7 @@ class DashboardScreen extends StatelessWidget {
                                 elevation: 0,
                               ),
                               onPressed: () {},
-                              child: Text("Register"),
+                              child: Text("view details"),
                             ),
                           ],
                         ),
@@ -359,10 +642,13 @@ class DashboardScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 12),
+                  
                 ],
               ),
             ),
           ),
+       
+
           SliverPadding(
             padding: EdgeInsets.symmetric(horizontal: 16),
             sliver: SliverGrid(
@@ -406,7 +692,9 @@ class DashboardScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 8),
                          AutoSizeText(
-                          menuItems[index]['title'],
+                          //menuItems[index]['title'],
+                           menuItems[index]['title'] == 'version' ? appVersion : menuItems[index]['title'],
+  
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
@@ -425,7 +713,9 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
           ),
-       
+
+
+ 
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.fromLTRB(16, 24, 16, 16),
@@ -527,6 +817,8 @@ class DashboardScreen extends StatelessWidget {
             ),
           ),
           SliverPadding(padding: EdgeInsets.only(bottom: 80)),
+       
+       
         ],
       ),
   
@@ -552,12 +844,16 @@ class DashboardScreen extends StatelessWidget {
         _buildBottomNavItem(
           icon: Icons.leaderboard_outlined,
           activeIcon: Icons.leaderboard,
-          label: "Leaderboard",
+          label: "Points Table",
           isActive: false,
           onTap: () {
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => LeaderboardPage()),
+            // );
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => LeaderboardPage()),
+              MaterialPageRoute(builder: (context) => CommingSoon()),
             );
           },
         ),
@@ -586,14 +882,26 @@ class DashboardScreen extends StatelessWidget {
           },
         ),
         _buildBottomNavItem(
-          icon: Icons.meeting_room_outlined,
-          activeIcon: Icons.meeting_room,
-          label: "Captain",
+          icon: Icons.score,
+          activeIcon: Icons.score,
+          label: "Score",
           isActive: false,
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => LogingCaptain()),
+              MaterialPageRoute(builder: (context) => Score()),
+            );
+          },
+        ),
+        _buildBottomNavItem(
+          icon: Icons.meeting_room_outlined,
+          activeIcon: Icons.meeting_room,
+          label: "Statistics",
+          isActive: false,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => CommingSoon()),
             );
           },
         ),
@@ -603,7 +911,9 @@ class DashboardScreen extends StatelessWidget {
 ),
     
     
+    )
     );
+  
   }
 
 

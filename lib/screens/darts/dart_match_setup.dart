@@ -136,7 +136,7 @@ class _DartsMatchSetup extends State<DartsMatchSetup> {
  Widget _buildStartButton() {
   return ElevatedButton(
     style: ElevatedButton.styleFrom(
-      backgroundColor: Colors.green,
+      backgroundColor: Colors.red,
     ),
     child: const Text(
       "START",
@@ -171,6 +171,7 @@ class _DartsMatchSetup extends State<DartsMatchSetup> {
       appBar: AppBar(
         centerTitle: true,
         title: Text("Match Setup"),
+        backgroundColor: const Color.fromARGB(255, 247, 74, 35),
       ),
       body: Container(
         margin: EdgeInsets.all(32),

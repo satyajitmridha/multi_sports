@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:multi_sports/themes.dart';
-import 'package:multi_sports/screens/about.dart';
+import '/themes.dart';
+import '/screens/about.dart';
 
 
 class StaticButtonGrid extends StatelessWidget {

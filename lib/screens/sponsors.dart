@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:multi_sports/api/apis.dart';
+import '/api/apis.dart';
 
 class Sponsors extends StatefulWidget {
   @override

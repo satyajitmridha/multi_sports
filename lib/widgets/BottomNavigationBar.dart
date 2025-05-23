@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:multi_sports/screens/about.dart';
-import 'package:multi_sports/screens/lederboard/leader_board.dart';
+import '/screens/about.dart';
+import '/screens/lederboard/leader_board.dart';
 
 
 class CustomBottomNavigationBar extends StatefulWidget {

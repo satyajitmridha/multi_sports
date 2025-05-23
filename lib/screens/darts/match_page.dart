@@ -89,6 +89,7 @@ class _MatchPageState extends State<MatchPage> {
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
+          backgroundColor: const Color.fromARGB(255, 247, 74, 35),
           title: FittedBox(
             fit: BoxFit.fitWidth,
             child: Text(

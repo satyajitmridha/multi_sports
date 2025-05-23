@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:multi_sports/api/apis.dart';
-import 'package:multi_sports/screens/owner_team/team_list.dart';
+import '/api/apis.dart';
+import '/screens/owner_team/team_list.dart';
 
 class OwnerList extends StatefulWidget {
   @override

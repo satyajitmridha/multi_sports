@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:multi_sports/themes.dart';
+import '/themes.dart';
 import 'dart:io';
 import 'package:intl/intl.dart';
 
