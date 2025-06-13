@@ -130,7 +130,7 @@ class _MatchResultPageState extends State<MatchResultPage>
         itemBuilder: (context, index) {
           final match = matches[index];
           return Card(
-            color: Colors.green[50], // Change the color as needed
+            color: Colors.red[50], // Change the color as needed
             margin: EdgeInsets.only(bottom: 16),
             child: Padding(
               padding: EdgeInsets.all(16),
@@ -138,7 +138,7 @@ class _MatchResultPageState extends State<MatchResultPage>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                      color: Colors.green[100], // Change the color as needed
+                      color: Colors.red[100], // Change the color as needed
                       padding: EdgeInsets.all(8), // Optional padding
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -220,7 +220,7 @@ class _MatchResultPageState extends State<MatchResultPage>
                           match['results'],
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.green,
+                            color: Colors.red,
                           ),
                         ),
                         SizedBox(height: 8),
@@ -259,9 +259,9 @@ class _MatchResultPageState extends State<MatchResultPage>
                       if (match['result_data'] != null)
   Container(
     decoration: BoxDecoration(
-      color: Colors.green[50],
+      color: Colors.red[50],
       borderRadius: BorderRadius.circular(8),
-      border: Border.all(color: Colors.green[100]!),
+      border: Border.all(color: Colors.red[100]!),
     ),
     margin: EdgeInsets.only(top: 12),
     child: ExpansionTile(
@@ -269,11 +269,11 @@ class _MatchResultPageState extends State<MatchResultPage>
         'Match Details',
         style: TextStyle(
           fontWeight: FontWeight.bold,
-          color: Colors.green[800],
+          color: Colors.red[800],
         ),
       ),
-      leading: Icon(Icons.score, color: Colors.green[800]),
-      trailing: Icon(Icons.expand_more, color: Colors.green[800]),
+      leading: Icon(Icons.score, color: Colors.red[800]),
+      trailing: Icon(Icons.expand_more, color: Colors.red[800]),
       children: [
         ...(match['result_data'] as Map<String, dynamic>)
             .entries
@@ -305,7 +305,7 @@ class _MatchResultPageState extends State<MatchResultPage>
                               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
                                 color: game.value['team_1_score']?.contains('WON') == true
-                                    ? Colors.green[100]
+                                    ? Colors.red[100]
                                     : game.value['team_2_score']?.contains('WON') == true
                                         ? Colors.red[100]
                                         : Colors.blue[100],
@@ -320,7 +320,7 @@ class _MatchResultPageState extends State<MatchResultPage>
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: game.value['team_1_score']?.contains('WON') == true
-                                      ? Colors.green[800]
+                                      ? Colors.red[800]
                                       : game.value['team_2_score']?.contains('WON') == true
                                           ? Colors.red[800]
                                           : Colors.blue[800],

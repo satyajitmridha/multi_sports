@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'match_result_page.dart';
-import 'screens/lederboard/leader_board.dart';
 import 'screens/owner_team/owner_list.dart';
 import 'screens/profile.dart';
 import 'screens/event_detail_screen.dart';
@@ -11,7 +10,6 @@ import 'screens/captain_room/loging_captain.dart';
 import 'screens/hand_book.dart';
 import 'screens/commitee.dart';
 import 'screens/sponsors.dart';
-import 'screens/owner_team/owner_list.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'match_schedule_page.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -21,18 +19,24 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'api/apis.dart';
+import 'api/fetch_apis.dart';
 import 'notification_service.dart';
 import 'screens/gallery.dart';
 import 'screens/social_media.dart';
 import 'screens/comming_soon.dart';
+import  '../api/api_response.dart';
+import 'screens/mobile_input_login_score.dart';
+import 'screens/otp_verification_screen.dart';
 
 
 void main() async {
-    WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  await NotificationService.initialize();
-    // Get and send FCM token
-  String? token = await NotificationService.getFCMToken();
+  //   WidgetsFlutterBinding.ensureInitialized();
+  // await Firebase.initializeApp();
+  // await NotificationService.initialize();
+  //   // Get and send FCM token
+  // String? token = await NotificationService.getFCMToken();
+
+  
   
   // if (token != null) {
   //   print("FCM Token: $token");
@@ -44,7 +48,15 @@ void main() async {
   // } else {
   //   print("Failed to get FCM token");
   // }
-  await NotificationService.sendTokenToServer(token);
+
+ // await NotificationService.sendTokenToServer(token);
+
+
+// WidgetsFlutterBinding.ensureInitialized();
+//    WidgetsFlutterBinding.ensureInitialized();
+//   await Firebase.initializeApp();
+//   await NotificationService.initialize();
+  
   
   runApp(SportsCarnivalApp());
 }
@@ -69,7 +81,7 @@ class SportsCarnivalApp extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           elevation: 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -93,6 +105,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   String? bannerImageUrl;
   String appVersion="1.0.0";
+  EventDetails? singleEvent;
 
 
   final List<Map<String, dynamic>> menuItems = [
@@ -111,8 +124,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
    
     
   ];
-
-  final List<Map<String, dynamic>> carouselItems = [
+  List<Map<String, dynamic>> carouselItems = [];
+  final List<Map<String, dynamic>> carouselItems1 = [
     {
       'imageUrl': 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
       'videoUrl': 'https://www.youtube.com/shorts/Wj4X_ZaktJ8',
@@ -145,13 +158,53 @@ class _DashboardScreenState extends State<DashboardScreen> {
     },
   ];
 
+    Future<void> fetchItems() async {
+    try {
+      List<Map<String, dynamic>> items = await ApiService.fetchCarouselItems();
+      setState(() {
+        carouselItems = items;
+      });
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+late Future<ApiResponse> futureEventDetails;
   @override
   void initState() {
     super.initState();
     fetchBannerData();
     fetchAppVersionData();
+    fetchItems();
+    futureEventDetails = fetchEventDetails();
+    _loadSingleEvent();
 
   }
+
+  Future<void> _loadSingleEvent() async {
+    try {
+      final apiResponse = await futureEventDetails;
+      setState(() {
+        singleEvent = apiResponse.eventDetails.first;
+      });
+    } catch (e) {
+      print('Error loading event: $e');
+    }
+  }
+
+Future<ApiResponse> fetchEventDetails() async {
+  final response = await http.get(
+    Uri.parse(Apis.showEvent),
+  );
+
+  if (response.statusCode == 200) {
+    // If the server returns a 200 OK response, parse the JSON
+    return ApiResponse.fromJson(json.decode(response.body));
+  } else {
+    // If the server did not return a 200 OK response, throw an exception
+    throw Exception('Failed to load event details');
+  }
+}
+
   Future<void> fetchBannerData() async {
     try {
       String? token = await NotificationService.getFCMToken();
@@ -259,7 +312,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       case 'Score':
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => Score()),
+          MaterialPageRoute(builder: (context) => MobileInputScreen()),
         );
         break;
       case 'Gallery':
@@ -597,23 +650,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         ),
                         SizedBox(height: 4),
-                        Text(
-                          "RDPL Championship",
-                          style: TextStyle(
+                        
+                        singleEvent != null
+                        ? Text(singleEvent!.eventName,
+                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                          ),)
+                        : CircularProgressIndicator(),
                         SizedBox(height: 8),
                         Row(
                           children: [
                             Icon(Icons.calendar_today, color: Colors.white, size: 16),
                             SizedBox(width: 8),
-                            Text(
-                              "June 15-20, 2023",
-                              style: TextStyle(color: Colors.white),
-                            ),
+                             singleEvent != null
+                        ? Text(singleEvent!.date,
+                         style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),)
+                        : CircularProgressIndicator(),
                             Spacer(),
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
@@ -624,8 +682,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ),
                                 elevation: 0,
                               ),
-                              onPressed: () {},
-                              child: Text("view details"),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => Event()),
+                                );
+                              },
+                              child: Text("view All"),
                             ),
                           ],
                         ),
@@ -731,7 +794,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
           SliverToBoxAdapter(
             child: Container(
               height: 200,
-              child: ListView.builder(
+              child:
+              carouselItems.isEmpty
+                ? Center(child: CircularProgressIndicator())
+                :
+              
+               ListView.builder(
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 scrollDirection: Axis.horizontal,
                 itemCount: carouselItems.length,
@@ -889,7 +957,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => Score()),
+              MaterialPageRoute(builder: (context) => MobileInputScreen()),
             );
           },
         ),

@@ -1,5 +1,6 @@
 class Apis{
     static const String baseUrl = "https://sports.forcempower.com/darts";
+     //static const String baseUrl = "https://rpgl.forcempower.com/RPGL2025";
     static const String baseUrlRPGL = "https://rpgl.forcempower.com/RPGL2025";
     static const String login = "$baseUrl/login";
     static const String register = "$baseUrl/register";
@@ -16,6 +17,16 @@ class Apis{
     static const String fetchBannerFCMDetails = "$baseUrl/sql_tracking_log.php";
     static const String about = "$baseUrl/about_details/about.php?username=";
     static const String showAppVersion = "$baseUrl/show_app_version.php";
+    static const String showHighlight = "$baseUrl/get_highlight.php";
+    static const String showEvent = "$baseUrl/events_v2.php";
+    static const String showToDaysMatchList = "$baseUrl/ws_todays_playing_match_list.php";
+    static const String updateScore = "$baseUrl/update_points_against_hole_for_score_v2.php";
+    static const String getScoreDetails = "$baseUrl/ws_get_points_list_against_hole_for_score_v2.php";
+  
+
+    
+    static const String wsMainLogin = "$baseUrl/ws_main_login_v3.php";
+    static const String wsMainLoginRPG = "$baseUrl/ws_main_login_v3.php";
 
   
 }

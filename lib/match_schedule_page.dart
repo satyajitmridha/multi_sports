@@ -129,7 +129,7 @@ class _MatchSchedulePageState extends State<MatchSchedulePage>
         itemBuilder: (context, index) {
           final match = matches[index];
           return Card(
-            color: Colors.green[50], // Change the color as needed
+            color: Colors.red[50], // Change the color as needed
             margin: EdgeInsets.only(bottom: 16),
             child: Padding(
               padding: EdgeInsets.all(16),
@@ -137,7 +137,7 @@ class _MatchSchedulePageState extends State<MatchSchedulePage>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                      color: Colors.green[100], // Change the color as needed
+                      color: Colors.red[100], // Change the color as needed
                       padding: EdgeInsets.all(8), // Optional padding
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -219,14 +219,14 @@ class _MatchSchedulePageState extends State<MatchSchedulePage>
                           match['results'],
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.green,
+                            color: Colors.red,
                           ),
                         ),
                         SizedBox(height: 8),
                         
                         if (match['result_data'] != null)
                         Container(
-                          color: Colors.green[100],
+                          color: Colors.red[100],
                           child: ExpansionTile(
                             title: Text('Match Details'),
                             leading: Icon(Icons.info),

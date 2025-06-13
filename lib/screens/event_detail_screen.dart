@@ -42,7 +42,19 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
     return Scaffold(
-      appBar: AppBar(title: Text(event['title'])),
+      appBar: AppBar(title: Text(event['title']),
+         flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color.fromARGB(255, 247, 74, 35),
+                const Color.fromARGB(235, 247, 74, 35)
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
         child: Column(
@@ -64,12 +76,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // Handle event registration
-              },
-              child: Text('Register for Event'),
-            ),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     // Handle event registration
+            //   },
+            //   child: Text('Register for Event'),
+            // ),
           ],
         ),
       ),
